@@ -183,7 +183,7 @@ a { color: inherit; }
 .cat img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 600ms cubic-bezier(0.25, 0.6, 0.3, 1); }
 /* Scrim: 48% black over the bottom third keeps the white name legible on bright shots. */
 .cat::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0, 0, 0, 0.48), rgba(0, 0, 0, 0) 33%); }
-.cat__name { position: absolute; left: var(--ci); right: var(--ci); bottom: var(--ci); z-index: 1; font-size: 16px; line-height: 24px; font-weight: 500; }
+.cat__name { position: absolute; left: var(--ci); right: var(--ci); bottom: var(--ci); z-index: 1; display: flex; align-items: center; gap: 4px; font-size: 16px; line-height: 24px; font-weight: 500; }
 @media (hover: hover) { .cat:hover img { transform: scale(1.03); } }
 .cat:focus-visible { outline-offset: -4px; outline-color: var(--white); }
 
@@ -208,7 +208,7 @@ html { scroll-behavior: smooth; }
 .dept-section__line { margin: 0; max-width: 480px; font-size: 20px; line-height: 28px; text-wrap: pretty; }
 /* Shop all link: 16px (1.6rem in the theme), no underline, then a 16px Phosphor arrow (Bold) 4px to
    the right. No underline, the trailing arrow and Bold weight are designer exceptions to C6 and C16
-   (2026-11-05). On hover the arrow slides out to
+   (2026-11-05). The category carousel cards use the same arrow and loop, triggered by hovering the card. On hover the arrow slides out to
    the right of its box and comes back in from the left. */
 .dept-section__link {
   display: inline-flex;
@@ -224,9 +224,11 @@ html { scroll-behavior: smooth; }
 .dept-section__arrow { display: inline-flex; width: 16px; height: 16px; overflow: hidden; }
 .dept-section__arrow svg { flex: none; }
 @media (hover: hover) {
-  .dept-section__link:hover .dept-section__arrow svg { animation: arrow-loop 480ms cubic-bezier(0.4, 0, 0.2, 1); }
+  .dept-section__link:hover .dept-section__arrow svg,
+  .cat:hover .dept-section__arrow svg { animation: arrow-loop 480ms cubic-bezier(0.4, 0, 0.2, 1); }
 }
-.dept-section__link:focus-visible .dept-section__arrow svg { animation: arrow-loop 480ms cubic-bezier(0.4, 0, 0.2, 1); }
+.dept-section__link:focus-visible .dept-section__arrow svg,
+.cat:focus-visible .dept-section__arrow svg { animation: arrow-loop 480ms cubic-bezier(0.4, 0, 0.2, 1); }
 @keyframes arrow-loop {
   0% { transform: translateX(0); }
   45% { transform: translateX(100%); }
@@ -234,7 +236,7 @@ html { scroll-behavior: smooth; }
   100% { transform: translateX(0); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .dept-section__link .dept-section__arrow svg { animation: none !important; }
+  .dept-section__arrow svg { animation: none !important; }
 }
 
 /* ---------- Grid ---------- */

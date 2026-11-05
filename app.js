@@ -133,7 +133,7 @@
       return `<li><a class="cat" href="#${s.key}">
         <img src="${img.src}?width=540" srcset="${srcset(img.src)}" sizes="(min-width: 990px) 15vw, (min-width: 750px) 28vw, 44vw"
           alt="" ${i < 6 ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">
-        <span class="cat__name">${s.title}</span>
+        <span class="cat__name"><span>${s.title}</span>${ARROW}</span>
       </a></li>`;
     }).join("");
     root.innerHTML = sections.map(sectionHTML).join("");
