@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Men · Pedal Mafia department prototype</title>
+  <meta name="description" content="Coded prototype of the Pedal Mafia Men's department page: one section per category, built on the live US catalog.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Pedal Mafia Men's department prototype">
+  <meta property="og:description" content="Coded prototype of the Pedal Mafia Men's department page: one section per category, built on the live US catalog.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#sections">Skip to products</a>
+
+  <header class="site-header">
+    <div class="announce">SPEND $99 MORE FOR FREE SHIPPING</div>
+    <nav class="nav" aria-label="Main">
+      <button class="icon-btn nav__menu" type="button" aria-label="Open menu">
+        <img src="assets/icons/list.svg" alt="" width="24" height="24">
+      </button>
+      <a class="logo" href="https://usa.pedalmafia.cc/" aria-label="Pedal Mafia home">
+        <img class="logo__mark" src="assets/icons/logo-mark.svg" alt="">
+        <img class="logo__word" src="assets/icons/logo-word.svg" alt="">
+      </a>
+      <ul class="nav__list">
+        <li><a href="#">NEW &amp; FEATURED</a></li>
+        <li><a href="#" aria-current="page">MEN</a></li>
+        <li><a href="#">WOMEN</a></li>
+        <li><a href="#">ACCESSORIES</a></li>
+        <li><a href="#">ARCHIVE SALE</a></li>
+        <li><a href="#">CUSTOM APPAREL</a></li>
+      </ul>
+      <div class="nav__secondary">
+        <a class="nav__text" href="#">About</a>
+        <a class="nav__text" href="#">Help</a>
+        <a class="icon-btn" href="#" aria-label="Search"><img src="assets/icons/search.svg" alt="" width="24" height="24"></a>
+        <a class="icon-btn nav__account" href="#" aria-label="Account"><img src="assets/icons/account.svg" alt="" width="24" height="24"></a>
+        <a class="icon-btn" href="#" aria-label="Cart"><img src="assets/icons/cart.svg" alt="" width="24" height="24"></a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="collection-header collection-header--dept">
+      <div class="collection-header__top">
+        <h1 class="collection-header__title">Men <span class="collection-header__count" id="count"></span></h1>
+        <div class="cats__arrows" id="cats-arrows" hidden>
+          <button class="icon-btn" type="button" data-dir="-1" aria-label="Scroll categories left"><img src="assets/icons/caret-left.svg" alt="" width="24" height="24"></button>
+          <button class="icon-btn" type="button" data-dir="1" aria-label="Scroll categories right"><img src="assets/icons/caret-right.svg" alt="" width="24" height="24"></button>
+        </div>
+      </div>
+      <nav class="cats" aria-label="Men's categories">
+        <ul class="cats__track" id="cats"></ul>
+        <div class="cats__progress" id="cats-progress" hidden><span></span></div>
+      </nav>
+    </section>
+
+    <div class="sections" id="sections"></div>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script src="preview.js"></script>
+  <script src="tuner.js"></script> <!-- TEMPORARY transition tuner -->
+  <script src="cards-tuner.js"></script> <!-- TEMPORARY card size panel -->
+  <script src="link-tuner.js"></script> <!-- TEMPORARY link color panel -->
+</body>
+</html>
