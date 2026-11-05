@@ -55,3 +55,4 @@ collection handles live in `SECTIONS` at the top of the script. Needs Pillow (`p
 - Inter stands in for ABC Whyte, the brand font, which is licensed and not bundled here.
 - Product images load from Shopify's CDN; nothing is copied into the repo.
 - Products with no white-background flat lay get a gray placeholder swatch (`#BBBDC0`).
+- The share image (`assets/og-image.jpg`, 1200 × 630) is a capture of the page top with `?clean=1`.
