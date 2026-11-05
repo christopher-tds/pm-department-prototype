@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Category covers · Pedal Mafia department prototype</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+  <style>
+    /* Review page for picking category carousel covers. Not part of the design. Cards reuse the
+       carousel card look (4:5, bottom scrim, name and arrow bottom left). */
+    :root { --ink: #000; --white: #fff; --card: #f3f3f3; --text-2: #404041; --border: #bbbdc0; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--white); color: var(--ink); font: 14px/20px "Inter", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    header { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 24px; background: var(--white); border-bottom: 1px solid var(--card); }
+    h1 { margin: 0; font-size: 24px; line-height: 32px; font-weight: 500; }
+    header p { margin: 4px 0 0; color: var(--text-2); }
+    .actions { display: flex; gap: 8px; flex: none; }
+    .btn { min-height: 40px; padding: 0 16px; border: 1px solid var(--ink); border-radius: 999px; background: var(--white); font: inherit; font-weight: 500; cursor: pointer; }
+    .btn--ink { background: var(--ink); color: var(--white); }
+    main { padding: 8px 24px 64px; }
+    .row { padding: 32px 0; border-bottom: 1px solid var(--card); }
+    .row h2 { margin: 0 0 16px; font-size: 20px; line-height: 28px; font-weight: 500; }
+    .row h2 span { color: var(--text-2); font-weight: 400; font-size: 14px; margin-left: 8px; }
+    .opts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    .opt { display: flex; flex-direction: column; gap: 8px; padding: 0; border: 0; background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+    .cat { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--card); color: var(--white); outline: 3px solid transparent; outline-offset: 3px; transition: outline-color 150ms ease; }
+    .cat img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .cat::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.48), rgba(0,0,0,0) 33%); }
+    .cat__name { position: absolute; left: 16px; bottom: 16px; z-index: 1; display: flex; align-items: center; gap: 4px; font-size: 16px; line-height: 24px; font-weight: 500; }
+    .opt:hover .cat { outline-color: var(--border); }
+    .opt[aria-pressed="true"] .cat { outline-color: var(--ink); }
+    .meta { display: flex; justify-content: space-between; gap: 8px; }
+    .meta b { font-weight: 500; }
+    .meta .check { display: none; font-weight: 500; }
+    .opt[aria-pressed="true"] .check { display: inline; }
+    .note { margin: 0; color: var(--text-2); }
+    @media (max-width: 749px) { .opts { grid-template-columns: repeat(2, minmax(0, 1fr)); } header { flex-direction: column; align-items: flex-start; } main, header { padding-left: 12px; padding-right: 12px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Category carousel covers</h1>
+      <p>Pick one per category; your picks save in this browser. Copy picks to send them back.</p>
+    </div>
+    <div class="actions">
+      <button class="btn" type="button" id="reset">Reset</button>
+      <button class="btn btn--ink" type="button" id="copy">Copy picks</button>
+    </div>
+  </header>
+  <main id="rows"></main>
+
+  <script>
+    const ROWS = [
+ {
+  "key": "jerseys",
+  "title": "Jerseys",
+  "current": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/PRO-GLITCH-WR-1-2.jpg",
+  "options": [
+   {
+    "src": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/PRO-NOMADIC-ECOM-1-15.jpg",
+    "product": "Men's Pro Nomadic Jersey - Ash",
+    "note": "Pro Nomadic, rider in the woods"
+   },
+   {
+    "src": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/NAESEN-EDIT-WEB-122.jpg",
+    "product": "Men's Core Jersey - Lawrence Naesen",
+    "note": "Lawrence Naesen collab with bike"
+   },
+   {
+    "src": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/PMxKENNY-SCHARF-ECOM-1-2.jpg",
+    "product": "Men's Core Long Sleeve Jersey - Kenny Scharf Blobism",
+    "note": "Kenny Scharf collab, arms crossed"
+   }
+  ]
+ },
+ {
+  "key": "bibs",
+  "title": "Bibs",
+  "current": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/CORE-CARGO-ROLLING.WR-49.jpg",
+  "options": [
+   {
+    "src": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/PRO-ECOM-6.jpg",
+    "product": "Men's Pro Race Bib - Blue",
+    "note": "Blue kit in the Dolomites"
+   },
+   {
+    "src": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/PEWR-1-2.jpg",
+    "product": "Men's Pro Bib - Black",
+    "note": "Red kit on the road with bike"
+   },
+   {
+    "src": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/PM-CARGO-F-1_6cce63ed-553a-436e-9a16-54df864a873b.jpg",
+    "product": "Men's Core Cargo Bib - Tan",
+    "note": "Seated in lime, studio"
+   }
+  ]
+ },
+ {
+  "key": "vests",
+  "title": "Vests",
+  "current": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/CORE-LIGHT-LOOKBOOK-WR-99.jpg",
+  "options": [
+   {
+    "src": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/CORE-LIGHT-LOOKBOOK-WR-52.jpg",
+    "product": "Men's Core Light Vest - Plum",
+    "note": "Red vest, studio"
+   },
+   {
+    "src": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/CORE-LIGHT-LOOKBOOK-WR-88.jpg",
+    "product": "Men's Core Light Vest - Green",
+    "note": "Green vest from the back"
+   },
+   {
+    "src": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/CORE-LIGHT-LOOKBOOK-WR-94.jpg",
+    "product": "Men's Core Light Vest - Light Lime",
+    "note": "Lime vest, studio"
+   }
+  ]
+ },
+ {
+  "key": "jackets",
+  "title": "Jackets",
+  "current": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/CORE-THERMAL-JACKET-WEB-RES-24.jpg",
+  "options": [
+   {
+    "src": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/CORE-LIGHT-LOOKBOOK-WR-35.jpg",
+    "product": "Men's Core Light Jacket - Plum",
+    "note": "Red jacket from the back"
+   },
+   {
+    "src": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/PRO-WINTER-WR-3_c5677bf4-4d83-494f-aa22-0b6f0d4f9eb1.jpg",
+    "product": "Men's Pro Sub 0 Thermal Jacket - Black",
+    "note": "Brown jacket, pulling the collar"
+   },
+   {
+    "src": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/CORE-LIGHT-LOOKBOOK-WR-81.jpg",
+    "product": "Men's Core Light Jacket - Green",
+    "note": "Green jacket, studio"
+   }
+  ]
+ },
+ {
+  "key": "socks",
+  "title": "Socks",
+  "current": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/VAPOUR_WEBRES-37_3769ea77-73b0-4c7f-99a4-40b14eda7f40.jpg",
+  "options": [
+   {
+    "src": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/KHxPM-WR-105.jpg",
+    "product": "Core Sock - Keith Haring x PM",
+    "note": "Keith Haring socks with shoes"
+   },
+   {
+    "src": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/KHxPM-WR-106.jpg",
+    "product": "Core Sock - Keith Haring x PM",
+    "note": "Foot up on a blue chair"
+   },
+   {
+    "src": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/J-MBxPM.ECOM.-29.jpg",
+    "product": "Core Sock - Jean-Michel Basquiat x PM",
+    "note": "Basquiat kit, seated"
+   }
+  ]
+ },
+ {
+  "key": "shirts",
+  "title": "Shirts and sweatshirts",
+  "current": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/MOVMENT_ECOM-7.jpg",
+  "options": [
+   {
+    "src": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/PMxSBW-WR-39.jpg",
+    "product": "Cotton Shirt - Wiggins Black",
+    "note": "Wiggins tee, arms crossed"
+   },
+   {
+    "src": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/CALEB-STUDIO.WR-39.jpg",
+    "product": "Cotton Shirt - Caleb Ewan Cream",
+    "note": "White tee, black and white"
+   },
+   {
+    "src": "https://cdn.shopify.com/s/files/1/0320/7643/1499/products/PM_ACTIVE-61_0a29f930-1262-4634-a892-6f3f7b11441c.jpg",
+    "product": "Pedal Mafia Gym Shirt - Grey",
+    "note": "Gym, black and white"
+   }
+  ]
+ },
+ {
+  "key": "gloves",
+  "title": "Gloves",
+  "current": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/PM_Gloves_July_024.jpg",
+  "options": [
+   {
+    "src": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/PRO-GLITCH-WR-1_814ed7c8-4fe2-4c8d-a0ed-1f3ad6e4571c.jpg",
+    "product": "Men's Pro Race Jersey - Glitch Flow Blue Shift",
+    "note": "White gloves, purple jersey"
+   },
+   {
+    "src": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/PRO-GLITCH-WR-3.jpg",
+    "product": "Men's Pro Race Jersey - Glitch Flow Ember",
+    "note": "White gloves, orange jersey"
+   },
+   {
+    "src": "https://cdn.shopify.com/s/files/1/0320/7643/1499/files/PRO-GLITCH-WR-1-3.jpg",
+    "product": "Men's Pro Race Jersey - Glitch Flow Desert Green",
+    "note": "White gloves, green jersey"
+   }
+  ]
+ }
+];
+    const KEY = "pm-dept-cover-picks";
+    const ARROW = '<svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z"/></svg>';
+    let picks = {};
+    try { picks = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { /* storage blocked */ }
+    const save = () => { try { localStorage.setItem(KEY, JSON.stringify(picks)); } catch (e) { /* storage blocked */ } };
+
+    function render() {
+      document.getElementById("rows").innerHTML = ROWS.map((r) => {
+        const opts = [{ label: "Current", src: r.current, note: "What the carousel uses now" },
+          ...r.options.map((o, i) => ({ label: "Option " + "ABC"[i], src: o.src, note: o.note, product: o.product }))];
+        const chosen = picks[r.key] || "Current";
+        return `<section class="row" aria-labelledby="h-${r.key}">
+          <h2 id="h-${r.key}">${r.title}<span>Picked: ${chosen}</span></h2>
+          <div class="opts" role="group" aria-label="${r.title} cover options">
+            ${opts.map((o) => `<button type="button" class="opt" data-key="${r.key}" data-label="${o.label}" aria-pressed="${o.label === chosen}">
+              <span class="cat"><img src="${o.src}?width=720" srcset="${o.src}?width=480 480w, ${o.src}?width=720 720w, ${o.src}?width=1000 1000w"
+                sizes="(min-width: 750px) 24vw, 46vw" alt="" loading="lazy" decoding="async">
+                <span class="cat__name">${r.title}${ARROW}</span></span>
+              <span class="meta"><b>${o.label}</b><span class="check">Picked</span></span>
+              <p class="note">${o.note}${o.product ? ` · ${o.product}` : ""}</p>
+            </button>`).join("")}
+          </div>
+        </section>`;
+      }).join("");
+    }
+
+    document.getElementById("rows").addEventListener("click", (e) => {
+      const b = e.target.closest(".opt");
+      if (!b) return;
+      picks[b.dataset.key] = b.dataset.label;
+      save();
+      const y = scrollY;
+      render();
+      scrollTo(0, y);
+    });
+    document.getElementById("reset").addEventListener("click", () => { picks = {}; save(); render(); });
+    document.getElementById("copy").addEventListener("click", (e) => {
+      const text = ROWS.map((r) => `${r.title}: ${picks[r.key] || "Current"}`).join("\n");
+      navigator.clipboard?.writeText(text).then(() => {
+        e.target.textContent = "Copied";
+        setTimeout(() => { e.target.textContent = "Copy picks"; }, 1200);
+      });
+    });
+    render();
+  </script>
+</body>
+</html>

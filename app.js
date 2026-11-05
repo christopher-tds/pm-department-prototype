@@ -25,14 +25,19 @@
 
   // Category cards in the header scroller: one per section, in page order, each jumping to its
   // section. The photo is the first on-figure shot in the section, preferring a 4:5 frame.
-  // Hand-picked covers where the first "on-figure" shot is really a product shot on a gray backdrop.
-  // The catalog has no on-model glove shot, so Gloves uses a detail close-up for now.
+  // Hand-picked covers, chosen on covers.html (2026-11-05). Sections not listed use their first
+  // on-figure shot.
   const CDN = "https://cdn.shopify.com/s/files/1/0320/7643/1499/";
   const COVERS = {
-    jackets: CDN + "files/CORE-THERMAL-JACKET-WEB-RES-24.jpg", // Core Thermal Jacket
+    jerseys: CDN + "files/PRO-NOMADIC-ECOM-1-15.jpg", // Pro Nomadic Jersey - Ash: Pro Nomadic, rider in the woods
+    bibs: CDN + "files/PEWR-1-2.jpg", // Pro Bib - Black: Red kit on the road with bike
+    vests: CDN + "files/CORE-LIGHT-LOOKBOOK-WR-52.jpg", // Core Light Vest - Plum: Red vest, studio
+    jackets: CDN + "files/PRO-WINTER-WR-3_c5677bf4-4d83-494f-aa22-0b6f0d4f9eb1.jpg", // Pro Sub 0 Thermal Jacket - Black: Brown jacket, pulling the collar
+    socks: CDN + "files/KHxPM-WR-105.jpg", // Core Sock - Keith Haring x PM: Keith Haring socks with shoes
+    shirts: CDN + "files/PMxSBW-WR-39.jpg", // Cotton Shirt - Wiggins Black: Wiggins tee, arms crossed
+    gloves: CDN + "files/PRO-GLITCH-WR-1-3.jpg", // Pro Race Jersey - Glitch Flow Desert Green: White gloves, green jersey
     headwear: CDN + "files/T-HAT.C-SHORT-WR-3.jpg", // Pro Technical Hat
     warmers: CDN + "products/CORE_ECOM_LB_WEB_REZ-74_1.jpg", // Arm Warmers
-    gloves: CDN + "files/PM_Gloves_July_024.jpg", // Pro Race Glove, detail
   };
 
   function categoryImage(s) {
