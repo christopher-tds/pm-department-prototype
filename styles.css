@@ -290,7 +290,7 @@ html { scroll-behavior: smooth; }
   .card__slide--alt { filter: none; transform: none; transition: opacity 200ms linear; }
 }
 
-/* Tablet, mobile and touch screens: swipe between the shots. A 2px bar 4px under the photo shows
+/* Tablet, mobile and touch screens: swipe between the shots. A 1px bar right under the photo shows
    how many there are and which one is up (Taylor Stitch pattern). It sits on white, not on the
    photo, so the black thumb reads on dark on-figure shots too. */
 .card__bar { display: none; }
@@ -311,9 +311,9 @@ html { scroll-behavior: smooth; }
     position: absolute;
     left: 0;
     right: 0;
-    bottom: -6px;
+    bottom: -1px;
     z-index: 1;
-    height: 2px;
+    height: 1px;
     background: var(--border);
     pointer-events: none;
   }
