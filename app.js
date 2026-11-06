@@ -58,6 +58,29 @@
     return [360, 540, 720, 900, 1200].map((w) => `${src}?width=${w} ${w}w`).join(", ");
   }
 
+  // ---------- Card images ----------
+
+  // Each card carries two shots: the flat lay first, then the on-figure shot. Desktop hover brings
+  // the second shot in with the rack focus; tablet and mobile swipe between them, with a thin bar
+  // under the photo showing there's more than one. Products without an on-figure shot keep one.
+  function shotsFor(p) {
+    const flat = { ...p.flat, flat: true };
+    return p.figure ? [flat, { ...p.figure, flat: false }] : [flat];
+  }
+
+  function slidesHTML(p, load) {
+    const shots = shotsFor(p);
+    const name = `${p.style}${p.colorway ? `, ${p.colorway}` : ""}`;
+    return `
+            <div class="card__slides">
+              ${shots.map((im, i) => `<div class="card__slide${i ? " card__slide--alt" : ""}">
+                <img class="${im.flat ? "is-flat" : ""}"${i ? "" : ` data-pid="${p.id}"`} src="${im.src}?width=720" srcset="${srcset(im.src)}"
+                  sizes="${SIZES}" width="${im.w}" height="${im.h}" alt="${i ? "" : name}" draggable="false"
+                  ${i ? 'loading="lazy"' : load} decoding="async"></div>`).join("")}
+            </div>
+            ${shots.length > 1 ? `<span class="card__bar" aria-hidden="true" style="--n:${shots.length}"><span class="card__bar-thumb"></span></span>` : ""}`;
+  }
+
   // ---------- Cards ----------
 
   function swatchList(section, card) {
@@ -70,7 +93,6 @@
   function cardHTML(section, card, eager) {
     const key = `${section}:${card.id}`;
     const p = byId.get(state.selected.get(key) || card.id);
-    const img = p.flat;
     const swatches = swatchList(section, card);
     const shown = swatches.slice(0, 4);
     const more = swatches.length - shown.length;
@@ -83,9 +105,7 @@
         <a class="card__link" href="${p.url}" target="_blank" rel="noopener">
           <div class="card__media">
             ${badge}
-            <img class="is-flat" data-pid="${p.id}" src="${img.src}?width=720" srcset="${srcset(img.src)}"
-              sizes="${SIZES}" width="${img.w}" height="${img.h}" alt="${p.style}${p.colorway ? `, ${p.colorway}` : ""}"
-              ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">
+            ${slidesHTML(p, eager ? 'fetchpriority="high"' : 'loading="lazy"')}
           </div>
           <div class="card__info">
             <div class="card__row">
@@ -190,7 +210,10 @@
     if (batch.length) reveal(batch);
   }, { rootMargin: "0px 0px -8% 0px", threshold: 0.15 });
 
-  const TILES = ".cats__track li, .card"; // category cards first, so they lead the stagger
+  // Category cards first, so they lead the stagger. The carousel animates the card inside each slot,
+  // not the slot: the slot is the scroll-snap target, and Chrome re-snaps the row to follow a
+  // transformed snap target, which dragged the whole carousel along with the fade.
+  const TILES = ".cats__track .cat, .card";
 
   // Cards already on screen play straight away (no wait for the observer's first callback); the rest
   // play as they scroll in.
@@ -259,15 +282,67 @@
   }
 
   // Show a colorway on a card's image and colorway line (used for hover previews).
+  // Replace a card's shots with another colorway's (hover previews), back on the first shot.
+  function swapSlides(article, p) {
+    const media = article.querySelector(".card__media");
+    media.querySelectorAll(".card__slides, .card__bar").forEach((el) => el.remove());
+    media.insertAdjacentHTML("beforeend", slidesHTML(p, 'loading="eager"'));
+  }
+
+  // Tablet and mobile: the bar's thumb follows the swipe. Scroll events don't bubble, so listen in
+  // the capture phase for any card's strip.
+  document.addEventListener("scroll", (e) => {
+    const strip = e.target;
+    if (!strip.classList || !strip.classList.contains("card__slides")) return;
+    const max = strip.scrollWidth - strip.clientWidth;
+    strip.parentElement.style.setProperty("--p", max > 0 ? Math.min(1, strip.scrollLeft / max) : 0);
+  }, true);
+
+  // Mouse drag for the strips, so the Tablet and Mobile frames can be swiped on a desktop. Touch
+  // and trackpads scroll natively. A drag that moves doesn't open the product.
+  let drag = null;
+  let dragged = false;
+  document.addEventListener("pointerdown", (e) => {
+    if (e.pointerType !== "mouse" || e.button !== 0) return;
+    const strip = e.target.closest(".card__slides");
+    if (!strip || strip.scrollWidth <= strip.clientWidth + 1) return;
+    e.preventDefault(); // no native image or link drag
+    drag = { strip, x: e.clientX, left: strip.scrollLeft, moved: false };
+  });
+  window.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x;
+    if (!drag.moved && Math.abs(dx) < 6) return;
+    if (!drag.moved) { drag.moved = true; drag.strip.classList.add("is-dragging"); }
+    drag.strip.scrollLeft = drag.left - dx;
+  });
+  window.addEventListener("pointerup", () => {
+    if (!drag) return;
+    const { strip, left, moved } = drag;
+    drag = null;
+    if (!moved) return;
+    dragged = true;
+    setTimeout(() => { dragged = false; });
+    const w = strip.clientWidth;
+    const from = Math.round(left / w);
+    const delta = strip.scrollLeft - left;
+    const last = strip.children.length - 1;
+    const to = Math.abs(delta) > w * 0.15 ? Math.max(0, Math.min(last, from + Math.sign(delta))) : from;
+    strip.scrollTo({ left: to * w, behavior: motionOff() ? "auto" : "smooth" });
+    const end = () => { clearTimeout(t); strip.classList.remove("is-dragging"); };
+    const t = setTimeout(end, 700);
+    strip.addEventListener("scrollend", end, { once: true });
+  });
+  document.addEventListener("click", (e) => {
+    if (dragged && e.target.closest(".card__slides")) { e.preventDefault(); e.stopPropagation(); }
+  }, true);
+
   function showColorway(article, p) {
     const img = article.querySelector(".card__media img");
     if (!img || Number(img.dataset.pid) === p.id) return;
-    img.dataset.pid = p.id;
-    img.srcset = srcset(p.flat.src);
-    img.src = p.flat.src + "?width=720";
-    img.alt = `${p.style}, ${p.colorway}`;
+    swapSlides(article, p);
     fadeColorway(article.querySelector(".card__color"), p.colorway);
-    rackImage(img);
+    rackImage(article.querySelector(".card__media img"));
   }
 
   // ---------- Events ----------
@@ -284,7 +359,7 @@
     const temp = document.createElement("div");
     temp.innerHTML = cardHTML(article.dataset.section, byId.get(Number(article.dataset.base)), false);
     const next = temp.firstElementChild;
-    next.querySelector("img").loading = "eager";
+    next.querySelectorAll("img").forEach((im) => { im.loading = "eager"; });
     article.replaceWith(next);
     if (!previewed) rackImage(next.querySelector(".card__media img"));
     next.querySelector(`[data-swatch="${pid}"]`).focus();

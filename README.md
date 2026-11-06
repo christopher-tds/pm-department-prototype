@@ -25,6 +25,9 @@ colorway, swatches).
 - **Cards:** same as the PLP prototype. Tapping a swatch swaps the tile in place; hovering previews
   the colorway with the rack focus and the colorway fade-up. Swatches cover every colorway in the
   collection, not just the ones on screen. Sold out and On sale badges per PM-10.
+- **Second shot:** on desktop, hovering a card photo brings in the on-figure shot with the rack
+  focus. On tablet and mobile, the photo swipes between the flat lay and the on-figure shot, with a
+  2px bar 4px under it (Taylor Stitch pattern). Products without an on-figure shot keep one image.
 - **Rack focus + fade up:** cards resolve into focus as they scroll into view, staggered across each
   row. Off with reduced motion.
 - **Review tools:** viewport switcher (Desktop / Tablet 820 × 1180 / Mobile 393 × 852), the

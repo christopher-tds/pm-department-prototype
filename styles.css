@@ -259,9 +259,72 @@ html { scroll-behavior: smooth; }
   background: var(--card);
   overflow: hidden;
 }
-.card__media img { width: 100%; height: 100%; object-fit: cover; }
+.card__media img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .card__media img.is-flat { mix-blend-mode: multiply; } /* PM-6: white flat lays sit on #F3F3F3 */
 .card.is-sold-out .card__media img { opacity: 0.5; }
+
+/* Two shots per card: flat lay, then on figure. Each sits on its own #F3F3F3 so a flat lay's
+   multiply never blends with the photo under it. */
+.card__slides { height: 100%; }
+.card__slide { height: 100%; background: var(--card); isolation: isolate; }
+
+/* Desktop hover: the second shot comes in with the rack focus (same blur, duration and easing as
+   the colorway swap) and eases back out on leave. */
+@media (hover: hover) and (min-width: 990px) {
+  .card__slides { position: relative; }
+  .card__slide--alt {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    filter: blur(calc(var(--rack-blur) * 0.75));
+    transform: scale(var(--rack-scale));
+    transition:
+      opacity var(--rack-img-dur) var(--rack-ease),
+      filter var(--rack-img-dur) var(--rack-ease),
+      transform var(--rack-img-dur) var(--rack-ease);
+  }
+  .card__media:hover .card__slide--alt { opacity: 1; filter: none; transform: none; }
+  html.rack-off .card__slide--alt { filter: none; transform: none; transition: opacity 200ms linear; }
+}
+@media (hover: hover) and (min-width: 990px) and (prefers-reduced-motion: reduce) {
+  .card__slide--alt { filter: none; transform: none; transition: opacity 200ms linear; }
+}
+
+/* Tablet, mobile and touch screens: swipe between the shots. A 2px bar 4px under the photo shows
+   how many there are and which one is up (Taylor Stitch pattern). It sits on white, not on the
+   photo, so the black thumb reads on dark on-figure shots too. */
+.card__bar { display: none; }
+@media (max-width: 989px), (hover: none) {
+  .card__slides {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .card__media { overflow: visible; } /* the strip clips the photos; this lets the bar sit below */
+  .card__slides::-webkit-scrollbar { display: none; }
+  .card__slides.is-dragging { scroll-snap-type: none; cursor: grabbing; }
+  .card__slide { flex: 0 0 100%; scroll-snap-align: start; scroll-snap-stop: always; }
+  .card__bar {
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -6px;
+    z-index: 1;
+    height: 2px;
+    background: var(--border);
+    pointer-events: none;
+  }
+  .card__bar-thumb {
+    display: block;
+    width: calc(100% / var(--n));
+    height: 100%;
+    background: var(--ink);
+    transform: translateX(calc(var(--p, 0) * (var(--n) - 1) * 100%));
+  }
+}
 
 .card__info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .card__row { display: flex; gap: 8px; align-items: flex-start; font-weight: 500; min-width: 0; }
